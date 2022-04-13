@@ -15,12 +15,18 @@ struct ContentView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
+    
+    let vehicleEmojis = ["🚂", "🚀", "🚁", "🚜"]
+    let fruitEmojis = ["🍎", "🫐", "🍒", "🥝"]
+    let flagEmojis = ["🇺🇸", "🇸🇪", "🇹🇻", "🇺🇦"]
 
     var emojis = ["🚂", "🚀", "🚁", "🚜"]
     @State var emojiCount = 4
     
     var body: some View {
         VStack {
+            Text("Memorize!")
+                .font(.largeTitle)
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
