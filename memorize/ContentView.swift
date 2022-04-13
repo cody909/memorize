@@ -16,12 +16,13 @@ struct ContentView: View {
         animation: .default)
     private var items: FetchedResults<Item>
     
-    let vehicleEmojis = ["🚂", "🚀", "🚁", "🚜"]
-    let fruitEmojis = ["🍎", "🫐", "🍒", "🥝"]
-    let flagEmojis = ["🇺🇸", "🇸🇪", "🇹🇻", "🇺🇦"]
-
-    var emojis = ["🚂", "🚀", "🚁", "🚜"]
-    @State var emojiCount = 4
+    let themes = [
+        "vehicles": ["🚂", "🚀", "🚁", "🚜"],
+        "animals": ["🐢", "🐧", "🐵", "🦑"],
+        "flags": ["🇺🇸", "🇸🇪", "🇹🇻", "🇺🇦"]
+    ]
+    
+    @State var emojis = ["🚂", "🚀", "🚁", "🚜"]
     
     var body: some View {
         VStack {
@@ -30,21 +31,22 @@ struct ContentView: View {
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
+                    ForEach(emojis[0..<emojis.count], id: \.self) { emoji in
                         CardView(content: emoji)
                             .aspectRatio(2/3, contentMode: .fit)
                     }
                 }
                 .foregroundColor(.red)
             }
-
             
             Spacer()
             
             HStack {
-                remove
+                selectVehicleTheme
                 Spacer()
-                add
+                selectFlagTheme
+                Spacer()
+                selectFruitTheme
             }
             .font(.largeTitle)
             .padding(.horizontal)
@@ -52,26 +54,39 @@ struct ContentView: View {
         .padding(.horizontal)
     }
     
-    var remove: some View {
+    var selectVehicleTheme: some View {
         Button {
-            if emojiCount > 1 {
-                emojiCount -= 1
-            }
+                emojis = themes["vehicles"]!.shuffled()
         } label: {
-            Image(systemName: "minus.circle")
+            VStack {
+                Image(systemName: "car")
+                Text("Vehicles").font(.footnote)
+            }
         }
     }
     
-    var add: some View {
-        Button(action: {
-            if emojiCount < emojis.count {
-                emojiCount += 1
+    var selectFlagTheme: some View {
+        Button {
+            emojis = themes["flags"]!.shuffled()
+        } label: {
+            VStack {
+                Image(systemName: "flag")
+                Text("Flags").font(.footnote)
             }
-        }, label: {
-            Image(systemName: "plus.circle")
-
-        })
+        }
     }
+    
+    var selectFruitTheme: some View {
+        Button {
+            emojis = themes["animals"]!.shuffled()
+        } label: {
+            VStack{
+                Image(systemName: "tortoise")
+                Text("Animals").font(.footnote)
+            }
+        }
+    }
+    
 }
 
 struct CardView: View {
