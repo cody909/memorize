@@ -15,74 +15,114 @@ struct ContentView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
-
+    
+    let themes = [
+        "vehicles": ["🚂", "🚀", "🚁", "🚜"],
+        "animals": ["🐢", "🐧", "🐵", "🦑"],
+        "flags": ["🇺🇸", "🇸🇪", "🇹🇻", "🇺🇦"]
+    ]
+    
+    @State var emojis = ["🚂", "🚀", "🚁", "🚜"]
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+        VStack {
+            Text("Memorize!")
+                .font(.largeTitle)
+            
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                    ForEach(emojis[0..<emojis.count], id: \.self) { emoji in
+                        CardView(content: emoji)
+                            .aspectRatio(2/3, contentMode: .fit)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .foregroundColor(.red)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+            
+            Spacer()
+            
+            HStack {
+                selectVehicleTheme
+                Spacer()
+                selectFlagTheme
+                Spacer()
+                selectFruitTheme
             }
-            Text("Select an item")
+            .font(.largeTitle)
+            .padding(.horizontal)
         }
+        .padding(.horizontal)
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    
+    var selectVehicleTheme: some View {
+        Button {
+                emojis = themes["vehicles"]!.shuffled()
+        } label: {
+            VStack {
+                Image(systemName: "car")
+                Text("Vehicles").font(.footnote)
             }
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    
+    var selectFlagTheme: some View {
+        Button {
+            emojis = themes["flags"]!.shuffled()
+        } label: {
+            VStack {
+                Image(systemName: "flag")
+                Text("Flags").font(.footnote)
             }
+        }
+    }
+    
+    var selectFruitTheme: some View {
+        Button {
+            emojis = themes["animals"]!.shuffled()
+        } label: {
+            VStack{
+                Image(systemName: "tortoise")
+                Text("Animals").font(.footnote)
+            }
+        }
+    }
+    
+}
+
+struct CardView: View {
+    @State var isFaceUp: Bool = true // creates a pointer to a variable and rebuild the view when a change in state is detected
+    
+    var content: String
+    
+    var body: some View {
+        ZStack {
+            let shape = RoundedRectangle(cornerRadius: 20)
+            if isFaceUp {
+                shape
+                    .fill()
+                    .foregroundColor(.white)
+                shape
+                    .strokeBorder(lineWidth: 3)
+                Text(content)
+                    .font(.largeTitle)
+            } else {
+                shape
+                    .fill()
+            }
+            
+        }
+        .onTapGesture {
+            isFaceUp = !isFaceUp
         }
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+            .preferredColorScheme(.dark)
+.previewInterfaceOrientation(.portrait)
+        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+            .preferredColorScheme(.light)
     }
 }
