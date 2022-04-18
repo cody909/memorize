@@ -20,7 +20,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Text(viewModel.themeName)
+            Text(viewModel.theme.name)
                 .font(.largeTitle)
             Text("Score: \(viewModel.score)")
 
