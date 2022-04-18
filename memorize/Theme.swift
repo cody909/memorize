@@ -18,7 +18,7 @@ struct EmojiMemoryGameTheme {
 
     static var themes: [Theme] = [
         Theme(name: "Animals", emojis: ["🐶","🐯","🐸","🐝"], color: "green", numberOfPairs: 4),
-        Theme(name: "Sports", emojis: ["⚽️","🏀","🏈","⚾️"], color: "red", numberOfPairs: 3),
+        Theme(name: "Sports", emojis: ["⚽️","🏀","🏈","⚾️"], color: "red", numberOfPairs: 8),
         Theme(name: "Halloween", emojis: ["🕷","🕸","🎃","🦇"], color: "orange", numberOfPairs: 4)
     ]
 }
