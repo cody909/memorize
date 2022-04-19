@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  EmojiMemoryGameView.swift
 //  memorize
 //
 //  Created by Cody Mercadante on 4/12/22.
@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct EmojiMemoryGameView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -16,21 +16,21 @@ struct ContentView: View {
         animation: .default)
     private var items: FetchedResults<Item>
     
-    @ObservedObject var viewModel: EmojiMemoryGame
+    @ObservedObject var game: EmojiMemoryGame
     
     var body: some View {
         VStack {
-            Text(viewModel.theme.name)
+            Text(game.theme.name)
                 .font(.largeTitle)
-            Text("Score: \(viewModel.score)")
+            Text("Score: \(game.score)")
 
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(viewModel.cards) { card in
+                    ForEach(game.cards) { card in
                         CardView(card: card)
                             .aspectRatio(2/3, contentMode: .fit)
                             .onTapGesture {
-                                viewModel.choose(card)
+                                game.choose(card)
                             }
                     }
                 }
@@ -39,7 +39,7 @@ struct ContentView: View {
             
             Spacer()
             Button {
-                viewModel.newGame()
+                game.newGame()
             } label: {
                 Text("New Game")
             }
@@ -49,7 +49,7 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    let card: MemoryGame<String>.Card
+    let card: EmojiMemoryGame.Card
     
     var body: some View {
         ZStack {
@@ -68,7 +68,6 @@ struct CardView: View {
                 shape
                     .fill()
             }
-            
         }
     }
 }
@@ -76,10 +75,10 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        ContentView(viewModel: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        EmojiMemoryGameView(game: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
 .previewInterfaceOrientation(.portrait)
-        ContentView(viewModel: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        EmojiMemoryGameView(game: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.light)
     }
 }
