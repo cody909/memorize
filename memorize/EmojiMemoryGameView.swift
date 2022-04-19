@@ -10,7 +10,7 @@ import CoreData
 
 struct EmojiMemoryGameView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
@@ -20,32 +20,55 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack {
-            Text(game.theme.name)
-                .font(.largeTitle)
-            Text("Score: \(game.score)")
-
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(game.cards) { card in
-                        CardView(card: card)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .onTapGesture {
-                                game.choose(card)
-                            }
-                    }
-                }
-                .foregroundColor(.red)
-            }
+            header()
             
-            Spacer()
-            Button {
-                game.newGame()
-            } label: {
-                Text("New Game")
+            AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
+                if card.isMatched && !card.isFaceUp {
+                    Rectangle().opacity(0)
+                } else {
+                    CardView(card: card)
+                        .padding(4)
+                        .onTapGesture {
+                            game.choose(card)
+                        }
+                }
             }
+            .foregroundColor(.red)
+            Spacer()
+            
+            newGameButton()
+        }
+    }
+    
+    @ViewBuilder
+    private func header() -> some View {
+        Text(game.theme.name).font(.largeTitle)
+        Text("Score: \(game.score)")
+    }
+    
+    //    @ViewBuilder
+    //    private func cardView(for card: EmojiMemoryGame.Card) -> some View {
+    //        if card.isMatched && !card.isFaceUp {
+    //            Rectangle().opacity(0)
+    //        } else {
+    //            CardView(card: card)
+    //                .padding(4)
+    //                .onTapGesture {
+    //                    game.choose(card)
+    //                }
+    //        }
+    //    }
+    
+    @ViewBuilder
+    private func newGameButton() -> some View {
+        Button {
+            game.newGame()
+        } label: {
+            Text("New Game")
         }
         .padding(.horizontal)
     }
+    
 }
 
 struct CardView: View {
@@ -73,9 +96,9 @@ struct CardView: View {
     }
     
     private struct DrawingConstants {
-        static let cornerRadius: CGFloat = 20
+        static let cornerRadius: CGFloat = 10
         static let lineWidth: CGFloat = 3
-        static let fontScale: CGFloat = 0.8
+        static let fontScale: CGFloat = 0.75
     }
 }
 
@@ -84,7 +107,7 @@ struct ContentView_Previews: PreviewProvider {
         let game = EmojiMemoryGame()
         EmojiMemoryGameView(game: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.dark)
-.previewInterfaceOrientation(.portrait)
+            .previewInterfaceOrientation(.portrait)
         EmojiMemoryGameView(game: game).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .preferredColorScheme(.light)
     }
